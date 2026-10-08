@@ -1,0 +1,58 @@
+# --- Secrets ---
+.env
+.env.*
+*.pem
+*.key
+
+# --- Model weights and quantized files (never commit) ---
+*.gguf
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.onnx
+*.npz
+models/
+weights/
+hf_cache/
+
+# --- Raw data (local only; small summaries committed explicitly) ---
+data/*
+!data/README.md
+!data/.gitkeep
+*.parquet
+*.arrow
+
+# --- llama.cpp and other local builds/binaries ---
+llama.cpp/
+llama-cpp/
+bin/
+build/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+.venv/
+venv/
+.python-version
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+.coverage
+htmlcov/
+
+# --- Tooling and OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
+*.tmp

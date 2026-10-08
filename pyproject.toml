@@ -1,0 +1,88 @@
+[project]
+name = "modeldetective"
+version = "0.1.0"
+description = "Can you detect quantization of an open-weight LLM from its text outputs alone? Queries-to-detect vs harm across a bit-width sweep."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Jana Milivojevic" }]
+dependencies = [
+    "numpy>=2.2,<3",
+    "pandas>=2.3,<3",
+    "pyarrow>=19,<22",
+    "scipy>=1.15,<2",
+    "scikit-learn>=1.6,<2",
+    "matplotlib>=3.10,<4",
+    "pyyaml>=6.0,<7",
+    "httpx>=0.28,<1",
+    "tqdm>=4.67,<5",
+    "pydantic>=2.11,<3",
+    "typer>=0.15,<1",
+]
+
+[project.optional-dependencies]
+# HF -> GGUF conversion (convert_hf_to_gguf.py needs torch + transformers). Installed in Phase 2.
+quantize = [
+    "torch>=2.6,<3",
+    "transformers>=4.51,<5",
+    "gguf>=0.17",
+    "sentencepiece>=0.2",
+    "huggingface-hub>=0.30",
+    "safetensors>=0.5",
+]
+# Baseline cross-check from the Model Equality Testing paper. Installed in Phase 1.
+baseline = [
+    "model-equality-testing",
+]
+# Demo app (Phase 8).
+app = [
+    "streamlit>=1.44,<2",
+]
+
+[project.scripts]
+modeldetective = "modeldetective.cli:app"
+
+[dependency-groups]
+dev = [
+    "ruff>=0.11",
+    "pytest>=8.3",
+    "pytest-cov>=6.0",
+    "pre-commit>=4.2",
+    "hypothesis>=6.130",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/modeldetective"]
+
+[tool.uv]
+default-groups = ["dev"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "N", "SIM", "RUF"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["B011"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --strict-markers"
+markers = [
+    "gpu: needs a GPU and model files (skipped in CI)",
+    "slow: long-running (skipped by default in CI)",
+]
+
+[tool.coverage.run]
+source = ["src/modeldetective"]

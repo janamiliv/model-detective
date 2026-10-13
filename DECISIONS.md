@@ -39,3 +39,25 @@ Running log of decisions and deviations. Newest at the bottom. Format: date, dec
 **Open question 4 (KL flags) resolved:** see `docs/hardware.md`, "Tools present in the build".
 
 **Phase 0 gate:** `make test` passes; llama.cpp loads and generates from a GGUF (on CPU). Passed with the GPU caveat above.
+
+## 2026-10-14 — Phase 1: literature pin and baseline reproduction setup
+
+**Primary sources read in full** (IRIS, One Token, MET) plus their code; details in `docs/related_work.md`. Corrections to PLAN.md's summary: One Token uses `max_tokens` 16 (not 1) and never tests quantization; its "8 cells" EER is a mean over random subsets; the IRIS 0.35/0.74/1.00 numbers come from the across-sizes paragraph (length-ablated, 5-fold), not Table 8 (0.37 ablated / 0.42 full at 0.6B). MET's quantization is bitsandbytes int8/nf4, not GGUF.
+
+**Reimplement IRIS's probe, parser, features and tell-rate protocol instead of running its scripts.** Why: its collectors speak only Ollama's native API; we serve with llama-server. Our implementation lives in `src/modeldetective/{probes/iris.py, detect/features.py, detect/tell_rate.py}` and is unit-tested on synthetic data (null near alpha, strong shift detected). Alternative rejected: installing Ollama (second, unpinned runtime; defeats the runtime-confound control).
+
+**Sampler for all comparisons: temperature 1.0, top_p 1.0, top_k 0, min_p 0, repeat_penalty 1.0, fixed per-request seeds, Qwen3 thinking disabled, no system prompt for IRIS probes.** Why: IRIS never set top_k, so Ollama's default (unrecorded) applied; we choose the fully untruncated distribution because truncation itself interacts with quantization. Deviation from IRIS, recorded. llama-server's own defaults (top_k 40, top_p 0.95, min_p 0.05) are never used.
+
+**Reference and variant are our own GGUFs** (f16 via convert_hf_to_gguf at b11429; Q4_K_M via llama-quantize at b11429), not Ollama's library builds. Hashes in `configs/models.yaml`. The official Qwen Q8_0 GGUF is kept only as a cross-check.
+
+**Phase 1 reproduction cells:** IRIS Table 8 at 0.6B: probes `short_bits_16` and `single_number_100`; 200 responses per label; independent second f16 run (250 per probe) as null. All on CPU (8 threads, 8 server slots), about 250 samples/min at f16.
+
+**Third-party code licenses:** IRIS code PolyForm Noncommercial 1.0.0, data CC BY-NC 4.0 (fine for this non-commercial project; cite and keep notices if redistributing). One Token author code MIT, data CC BY 4.0; verbatim prompts copied to `configs/one_token_prompts.zenodo.json`. MET code MIT; dataset license unstated. Qwen3 0.6B/1.7B/4B are Apache-2.0: results may be published.
+
+**Phase 1 gate result:** appended below once the run finishes.
+
+**Phase 1 gate result (2026-10-14): PASSED.** Q4_K_M vs f16 at 0.6B on 16 random bits, content-only features: q = 0.39 [0.25, 0.55], AUROC 0.83, clears the alpha floor; f16-vs-f16 null q = 0.06 [0.01, 0.15]. IRIS reported 0.37 [0.17, 0.51] and null 0.03. Full table in `results/phase1_iris_repro.md`. Full-feature q is higher than IRIS (0.56 vs 0.42); attributed to sampler/runtime/build differences and the reason content-only is primary.
+
+**Finding to carry into Phase 3: the IRIS number parser is defeated by prompt echo at 0.6B.** The first integer in 95–99% of responses is the "1" from the prompt text. The `single_number_100` null result is therefore a parser artifact. Decision: Phase 3 number parser takes the last integer and flags echoed-only rows; documented in `docs/prereg.md` §7.
+
+**Pre-registration drafted (`docs/prereg.md`), not frozen.** Needs owner review; freeze by tagging `prereg-v1` before collecting beyond the Phase 1 cells.

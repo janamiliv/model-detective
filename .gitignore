@@ -56,3 +56,7 @@ htmlcov/
 Thumbs.db
 *.log
 *.tmp
+
+# --- third-party code checkouts (reproduction only) ---
+tools/third_party/
+tools/llama.cpp/

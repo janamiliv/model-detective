@@ -12,7 +12,7 @@ Recorded 2026-10-08/09. All local experiments run on this machine unless DECISIO
 | RAM | 15.4 GB usable, DDR4-3200 |
 | GPU | NVIDIA GeForce GTX 1650 (laptop), 4096 MiB VRAM, compute capability 7.5 (Turing) |
 | NVIDIA driver | 535.98 (CUDA 12.2) until 2026-10-14; **617.42 (CUDA 13.4) from 2026-10-14** |
-| Disk | D: 182 GB, 81 GB free at start |
+| Disk | D: NVMe 182 GB (repo, venv, llama.cpp binaries, data pools). E: WD My Passport USB HDD 1.8 TB (`models/` lives at `E:\model-detective\models`, reached through an NTFS junction at `models/` in the repo since 2026-10-15; model loads are slower from USB but happen once per server start) |
 
 Note: desktop apps (chat clients, browsers) hold about 1.7 GB of VRAM when open. Close them before collection runs.
 

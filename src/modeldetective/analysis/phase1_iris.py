@@ -17,6 +17,7 @@ Run:  uv run python -m modeldetective.analysis.phase1_iris [collect|analyze|all]
 from __future__ import annotations
 
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -34,8 +35,18 @@ MODEL_DIR = Path("models/qwen3-0.6b")
 FILES = {"f16": "Qwen3-0.6B-f16.gguf", "Q4_K_M": "Qwen3-0.6B-Q4_K_M.own.gguf"}
 PROBES = ["short_bits_16", "single_number_100"]
 N_MAIN, N_NULL = 200, 250
-DATA_DIR = Path("data/phase1_iris")
-RESULTS = Path("results/phase1_iris_repro.json")
+# BACKEND=cpu (default) or cuda. Each backend gets its own data and results so they can be compared.
+BACKEND = os.environ.get("BACKEND", "cpu").lower()
+if BACKEND not in ("cpu", "cuda"):
+    raise SystemExit(f"BACKEND must be cpu or cuda, got {BACKEND!r}")
+GPU_KW = (
+    {"n_gpu_layers": 0, "device": "none"}
+    if BACKEND == "cpu"
+    else {"n_gpu_layers": 99, "device": None}
+)
+SUFFIX = "" if BACKEND == "cpu" else "_cuda"
+DATA_DIR = Path(f"data/phase1_iris{SUFFIX}")
+RESULTS = Path(f"results/phase1_iris_repro{SUFFIX}.json")
 SAMPLER = SamplerConfig(temperature=1.0, top_p=1.0, top_k=0, min_p=0.0, repeat_penalty=1.0)
 PORT = 8093
 PARALLEL = 8
@@ -57,6 +68,7 @@ def collect() -> None:
             ctx_size=512 * PARALLEL,
             threads=8,
             log_path=DATA_DIR / f"server_{variant}_run{run_id}.log",
+            **GPU_KW,
         )
         DATA_DIR.mkdir(parents=True, exist_ok=True)
         with srv:
@@ -84,7 +96,7 @@ def _load(variant: str, run_id: int, probe_id: str) -> pd.DataFrame:
 
 
 def analyze() -> dict:
-    out: dict = {"model": MODEL, "sampler": SAMPLER.__dict__, "cells": {}}
+    out: dict = {"model": MODEL, "backend": BACKEND, "sampler": SAMPLER.__dict__, "cells": {}}
     for probe_id in PROBES:
         ref, sub, null = (_load(v, r, probe_id) for v, r, _ in RUNS)
         f_ref, f_sub, f_null = (_features(d, probe_id) for d in (ref, sub, null))

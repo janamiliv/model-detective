@@ -11,7 +11,7 @@ Recorded 2026-10-08/09. All local experiments run on this machine unless DECISIO
 | CPU | AMD Ryzen 7 4800H, 8 cores / 16 threads, 2.9 GHz base |
 | RAM | 15.4 GB usable, DDR4-3200 |
 | GPU | NVIDIA GeForce GTX 1650 (laptop), 4096 MiB VRAM, compute capability 7.5 (Turing) |
-| NVIDIA driver | 535.98 (reports CUDA 12.2) |
+| NVIDIA driver | 535.98 (CUDA 12.2) until 2026-10-14; **617.42 (CUDA 13.4) from 2026-10-14** |
 | Disk | D: 182 GB, 81 GB free at start |
 
 Note: desktop apps (Discord, browsers) hold about 1.7 GB of VRAM when open. Close them before collection runs.
@@ -61,7 +61,19 @@ Model: `Qwen/Qwen3-0.6B-GGUF`, file `Qwen3-0.6B-Q8_0.gguf`, HF revision `23749fe
 | Vulkan (`llama-b11429-bin-win-vulkan-x64.zip`, SHA256 `1bfe78ad9168b79fa02bf67f6af9f5e17a966d824d77238517f7bef12ac73b36`) | **Hangs** at startup with no log output for over 10 minutes; killed. Not investigated further. |
 | CPU (`--device none -ngl 0`) | **Passes.** Greedy completion of "The capital of Serbia is" gives "Belgrade, and the capital of Montenegro is Podgorica. ..." |
 
-**Fix for GPU:** update the NVIDIA driver to one that supports CUDA 12.4 or newer (driver 550 or later; the GTX 1650 is supported by current drivers). Then re-run the CUDA gate. Until then everything runs on CPU, which is acceptable for 0.6B and 1.7B one-token probes but slow for building large pools.
+**Fix applied 2026-10-14:** driver updated to 617.42 (CUDA 13.4). The CUDA gate now passes with the same pinned b11429 CUDA-12.4 binary: identical greedy output to the CPU run ("Belgrade, and the capital of Montenegro is Podgorica..."), 82 tokens/s single-stream vs 13 on CPU. All 29/29 layers offload (`load_tensors: offloaded 29/29 layers to GPU`). The first request after each process start pays a one-time PTX JIT compile of 13-21 s per quant type (the driver caches it afterwards).
+
+### Throughput (Qwen3 0.6B, llama-server, 8 slots, temperature 1, 16-bit probe)
+
+| Backend | Variant | Steady state | Notes |
+|---|---|---|---|
+| CPU (8 threads) | f16 | ~250 samples/min, ~86 gen tok/s | measured with 24-token cap, mean 20 tokens |
+| CUDA | f16 | 183 samples/min, 84 gen tok/s | GPU ran at 855 MHz / 22 W under load (max 1785 MHz / 50 W) |
+| CUDA | Q4_K_M | 244 samples/min, 138 gen tok/s | |
+
+The GPU is not faster than the CPU at 0.6B under the conditions measured: Windows "Balanced" power plan, and other apps (Stremio video decode at ~33% SM, Wallpaper Engine) sharing the GPU. No thermal or power-cap throttling was flagged. For collection runs: close GPU-using apps and consider the High performance power plan. The GPU matters more at 1.7B and 4B, where CPU decode slows down faster than GPU decode.
+
+**Backend policy (prereg §4):** every comparison uses one backend. Phase 1 cells were collected on CPU and re-collected on CUDA as a cross-backend check (see `results/phase1_iris_repro*.json`).
 
 ### Tools present in the build
 

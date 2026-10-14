@@ -46,7 +46,11 @@ quantization measurably harms task behavior?
   re-passed after a driver update, in which case **all** cells are re-collected on the GPU; no
   mixing of backends within a comparison.
 - Sampler: temperature 1.0, top_p 1.0, top_k 0, min_p 0, repeat_penalty 1.0. Qwen3 thinking off.
-- Seeds: unique per request, derived deterministically from (run_id, probe, index); recorded.
+- Seeds: unique per request and **disjoint across every pool** (every variant and every run gets
+  its own seed range), derived deterministically from (pool_id, probe, index) and recorded. Why:
+  with this build, the same seed reproduces the same text across backends 94% of the time and,
+  for a peaked prompt, can reproduce it across variants too; shared seeds would plant duplicate
+  strings in both sides of a comparison and bias the detector toward "same".
 - 8 server slots, 8 threads.
 - Pre-check before collection: 20 requests with identical seed and prompt must return identical
   text on the chosen backend; if not, the backend is documented as non-deterministic and seeds are

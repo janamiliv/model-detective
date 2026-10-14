@@ -1,0 +1,35 @@
+{
+  "probe": "short_bits_16",
+  "comparison": "f16 run1 CPU (seeds run1) vs f16 run2 CUDA (seeds run2)",
+  "same_seed_identical_text_fraction": 0.94,
+  "full": {
+    "q_mean": 0.0534,
+    "q_sd": 0.03028141513476711,
+    "q_lo": 0.0078000000000000005,
+    "q_hi": 0.11239999999999999,
+    "ref_false_alarm_mean": 0.04725,
+    "auroc_mean": 0.526099,
+    "n_ref": 200,
+    "n_sub": 250,
+    "n_features": 53,
+    "n_splits": 40,
+    "alpha": 0.05,
+    "clears_floor": false,
+    "m_star_eps0.1": 560.9985530999982
+  },
+  "content_only": {
+    "q_mean": 0.055600000000000004,
+    "q_sd": 0.029096479653132064,
+    "q_lo": 0.0078000000000000005,
+    "q_hi": 0.11259999999999996,
+    "ref_false_alarm_mean": 0.04625,
+    "auroc_mean": 0.5297769999999999,
+    "n_ref": 200,
+    "n_sub": 250,
+    "n_features": 28,
+    "n_splits": 40,
+    "alpha": 0.05,
+    "clears_floor": false,
+    "m_star_eps0.1": 538.8007686248184
+  }
+}

@@ -37,3 +37,26 @@ IRIS any-tell budget m* = ln(1/0.05) / (0.1 q) at routing fraction 0.1: ours 54 
 ## Deviations from IRIS
 
 Sampler (top_k 0 / min_p 0 vs unrecorded Ollama default), runtime (llama-server vs Ollama), quantization build (own Q4_K_M vs Ollama library), hardware (CPU vs A40), seeds (fixed vs none). See DECISIONS.md 2026-10-14.
+
+## Cross-backend check (2026-10-14, after the driver update)
+
+The same six cells were re-collected on CUDA (`BACKEND=cuda`, `phase1_iris_repro_cuda.json`).
+
+| Probe | Features | CPU q | CUDA q | CPU null | CUDA null |
+|---|---|---|---|---|---|
+| 16 bits | full | 0.56 [0.42, 0.68] | 0.49 [0.30, 0.64] | 0.06 | 0.05 |
+| 16 bits | content-only | 0.39 [0.25, 0.55] | 0.33 [0.17, 0.49] | 0.06 | 0.06 |
+| integer 1–100 | content-only | 0.00 | 0.00 | 0.02 | 0.02 |
+
+Both backends clear the floor on 16 bits and agree within their bands.
+
+**Runtime confound test** (`phase1_backend_confound.json`): f16 on CPU vs f16 on CUDA, disjoint
+seeds, 16 bits: q = 0.05 [0.01, 0.11] full, 0.06 [0.01, 0.11] content-only, AUROC 0.53. The two
+backends of this build are indistinguishable by this detector, so backend is not a confound here.
+(A first attempt with shared seeds gave AUROC 0.19, below chance, because the same seed produces
+identical text on CPU and CUDA 94% of the time and the duplicates leaked across train and test.)
+
+**Seed-sharing caveat on the main result.** The f16 reference and Q4_K_M pools above also shared
+seeds (same run id). 9% of same-seed pairs are byte-identical between f16 and Q4_K_M on 16 bits
+(0% on the integer probe), which pushes q *down*. The gate result is therefore conservative. From
+here on every pool has its own seed range (prereg §4; `collect/runner.py`).

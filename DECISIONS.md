@@ -61,3 +61,17 @@ Running log of decisions and deviations. Newest at the bottom. Format: date, dec
 **Finding to carry into Phase 3: the IRIS number parser is defeated by prompt echo at 0.6B.** The first integer in 95–99% of responses is the "1" from the prompt text. The `single_number_100` null result is therefore a parser artifact. Decision: Phase 3 number parser takes the last integer and flags echoed-only rows; documented in `docs/prereg.md` §7.
 
 **Pre-registration drafted (`docs/prereg.md`), not frozen.** Needs owner review; freeze by tagging `prereg-v1` before collecting beyond the Phase 1 cells.
+
+## 2026-10-14 (evening) — NVIDIA driver updated, CUDA gate passes
+
+**Driver 535.98 → 617.42 (CUDA 13.4).** The pinned b11429 CUDA-12.4 binary now runs: 29/29 layers offload, greedy output identical to CPU, 82 tok/s single-stream. Phase 0 GPU caveat closed.
+
+**GPU is not a throughput win at 0.6B under current conditions.** Batched sampling: CUDA f16 183/min vs CPU ~250/min; CUDA Q4_K_M 244/min. Under load the GPU sat at 855 MHz / 22 W of 1785 MHz / 50 W with no throttle flags, on the Balanced power plan, while Stremio was decoding video on it. Decision: keep CPU as the default backend for 0.6B collection; use CUDA for 1.7B and 4B where it should pull ahead; never mix backends within one comparison. Before long GPU runs, close GPU-using apps and consider the High performance power plan (user's call; not changed by the agent).
+
+**Phase 1 cells re-collected on CUDA** (`BACKEND=cuda`, separate `data/phase1_iris_cuda/` and `results/phase1_iris_repro_cuda.json`) as a cross-backend check of the baseline. Result appended below.
+
+**CUDA cross-backend result (2026-10-14):** 16-bit content-only q = 0.33 [0.17, 0.49] on CUDA vs 0.39 [0.25, 0.55] on CPU; nulls 0.06 on both. Consistent.
+
+**Runtime confound measured and negative:** f16-CPU vs f16-CUDA with disjoint seeds is at the floor (q 0.05–0.06, AUROC 0.53). Backend is not a confound for this build; the prereg's "one backend per comparison" rule stays as a precaution.
+
+**Seed-sharing bug found and fixed.** Same seed reproduces identical text across backends 94% of the time, and across f16/Q4_K_M 9% of the time on 16 bits. Phase 1 pools shared seeds between reference and substitute, biasing q downward (conservative; gate still passes). `seed_for` now derives disjoint ranges per (model, variant, run, probe); prereg §4 updated. Phase 1 data is kept as is and labeled; Phase 3 collection uses the new rule.

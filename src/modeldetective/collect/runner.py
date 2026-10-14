@@ -36,8 +36,13 @@ class Cell:
 
 
 def seed_for(cell: Cell, i: int) -> int:
-    """Deterministic, unique per (run, probe, index); recorded in the data."""
-    return (cell.run_id * 1_000 + (zlib.crc32(cell.probe.id.encode()) % 997)) * 1_000_000 + i
+    """Deterministic and disjoint across pools: (model, variant, run, probe) each get their own range.
+
+    Shared seeds across pools would plant identical strings on both sides of a comparison
+    (prereg section 4), so the variant and run are part of the derivation.
+    """
+    pool = f"{cell.model}|{cell.variant}|{cell.run_id}|{cell.probe.id}"
+    return (zlib.crc32(pool.encode()) % 2_000_000) * 1_000_000 + i
 
 
 def collect_cell(

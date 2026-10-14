@@ -75,3 +75,13 @@ Running log of decisions and deviations. Newest at the bottom. Format: date, dec
 **Runtime confound measured and negative:** f16-CPU vs f16-CUDA with disjoint seeds is at the floor (q 0.05–0.06, AUROC 0.53). Backend is not a confound for this build; the prereg's "one backend per comparison" rule stays as a precaution.
 
 **Seed-sharing bug found and fixed.** Same seed reproduces identical text across backends 94% of the time, and across f16/Q4_K_M 9% of the time on 16 bits. Phase 1 pools shared seeds between reference and substitute, biasing q downward (conservative; gate still passes). `seed_for` now derives disjoint ranges per (model, variant, run, probe); prereg §4 updated. Phase 1 data is kept as is and labeled; Phase 3 collection uses the new rule.
+
+## 2026-10-15 — Phase 2: quantization pipeline
+
+**Pipeline script** `src/modeldetective/quantize/pipeline.py`: HF → f16 (convert_hf_to_gguf at b11429) → Q8_0, Q6_K, Q5_K_M, Q4_K_M, Q3_K_M, Q2_K (llama-quantize b11429, no importance matrix so variants differ only in bit-width). One JSON manifest per file (revision, build, command, size, SHA256, parameter count, bits/weight, smoke output). Resumable. Summary table committed at `results/variants_table.md`; manifests and GGUFs stay local.
+
+**Qwen3 0.6B: all seven files built and smoke-tested.** Q2_K is degenerate on the greedy smoke prompt ("20200000000..."), Q3_K_M loses the factual answer. Expect the prereg's degenerate-variant rule to apply to Q2_K at 0.6B.
+
+**Seed determinism pre-check (prereg §4) passed on both backends:** 20 same-seed requests, serial and 4-way concurrent, CPU and CUDA, each gave exactly one distinct text. Seeds are therefore true replay handles on this build, which is also why pools must have disjoint seeds.
+
+**Pinned revisions:** Qwen3-1.7B 70d244cc86ccca08cf5af4e1e306ecf908b1ad5e; Qwen3-4B 1cfa9a7208912126459214e8b04321603b3df60c (to be written into configs/models.yaml with hashes once built).

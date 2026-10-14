@@ -34,6 +34,11 @@ quantize = [
 baseline = [
     "model-equality-testing",
 ]
+# ONNX Runtime track for H3 (Phase 2/6): model builder + generation, CPU execution provider.
+onnx = [
+    "onnxruntime-genai==0.18.0",
+    "onnx>=1.17",
+]
 # Demo app (Phase 8).
 app = [
     "streamlit>=1.44,<2",

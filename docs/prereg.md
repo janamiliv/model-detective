@@ -77,8 +77,8 @@ quantization measurably harms task behavior?
   this is the trade-off made.)
 - MET-style prompts: 40 per prompt per variant (1,000 per variant).
 - Logprobs: top-20 next-token logprobs recorded for every one-token cell (oracle distance).
-- Per model size this is about 70,000 requests: roughly 5 hours on CPU at 0.6B. 1.7B and 4B run
-  on CUDA.
+- Per model size this is about 87,000 requests (IRIS 40,000; One Token 39,000; MET 8,000), as
+  enumerated by the sweep dry runs: roughly 6 hours on CPU at 0.6B. 1.7B and 4B run on CUDA.
 
 ## 7. Parsing and exclusion rules
 

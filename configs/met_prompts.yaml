@@ -1,0 +1,130 @@
+description: 'MET-style natural continuation prompts: 25 Wikipedia lead-paragraph snippets (100 chars), 5 per language (en/de/es/fr/ru), template from Gao et al. ICLR 2025 Box 1.'
+license: Snippets from Wikipedia, CC BY-SA 4.0; see each source URL.
+fetched_utc: '2026-10-14T22:17:58+00:00'
+max_tokens: 50
+prompts:
+- id: met_00_en
+  lang: en
+  source: https://en.wikipedia.org/wiki/Photosynthesis
+  snippet: Photosynthesis is a system of biological processes by which photopigment-bearing autotrophic organis
+  prompt: Continue the paragraph. Do not output anything except the continuation to the paragraph. Start the continuation immediately. "Photosynthesis is a system of biological processes by which photopigment-bearing autotrophic organis..."
+- id: met_01_en
+  lang: en
+  source: https://en.wikipedia.org/wiki/Danube
+  snippet: The Danube ( DAN-yoob; see also other names) is a river in Europe, the second-longest after the Volg
+  prompt: Continue the paragraph. Do not output anything except the continuation to the paragraph. Start the continuation immediately. "The Danube ( DAN-yoob; see also other names) is a river in Europe, the second-longest after the Volg..."
+- id: met_02_en
+  lang: en
+  source: https://en.wikipedia.org/wiki/Chess
+  snippet: Chess is a board game for two players, played on a square board consisting of 64 squares arranged in
+  prompt: Continue the paragraph. Do not output anything except the continuation to the paragraph. Start the continuation immediately. "Chess is a board game for two players, played on a square board consisting of 64 squares arranged in..."
+- id: met_03_en
+  lang: en
+  source: https://en.wikipedia.org/wiki/Lighthouse
+  snippet: A lighthouse is a tower, building, or other type of physical structure designed to emit light from a
+  prompt: Continue the paragraph. Do not output anything except the continuation to the paragraph. Start the continuation immediately. "A lighthouse is a tower, building, or other type of physical structure designed to emit light from a..."
+- id: met_04_en
+  lang: en
+  source: https://en.wikipedia.org/wiki/Honey
+  snippet: 'Honey is a sweet and viscous substance made by several species of bees, the best-known of which are '
+  prompt: Continue the paragraph. Do not output anything except the continuation to the paragraph. Start the continuation immediately. "Honey is a sweet and viscous substance made by several species of bees, the best-known of which are ..."
+- id: met_05_de
+  lang: de
+  source: https://de.wikipedia.org/wiki/Schwarzwald
+  snippet: Der Schwarzwald ist mit bis zu 1493 m ü. NHN und über 6000 Quadratkilometern Fläche Deutschlands höc
+  prompt: Continue the paragraph. Do not output anything except the continuation to the paragraph. Start the continuation immediately. "Der Schwarzwald ist mit bis zu 1493 m ü. NHN und über 6000 Quadratkilometern Fläche Deutschlands höc..."
+- id: met_06_de
+  lang: de
+  source: https://de.wikipedia.org/wiki/Buchdruck
+  snippet: Der Buchdruck, historisch auch Buchdruckerkunst genannt, ist ein mechanischer Prozess zur Herstellun
+  prompt: Continue the paragraph. Do not output anything except the continuation to the paragraph. Start the continuation immediately. "Der Buchdruck, historisch auch Buchdruckerkunst genannt, ist ein mechanischer Prozess zur Herstellun..."
+- id: met_07_de
+  lang: de
+  source: https://de.wikipedia.org/wiki/Nordsee
+  snippet: Die Nordsee (veraltet Westsee, Deutsches Meer) ist ein Randmeer des Atlantischen Ozeans. Sie ist ein
+  prompt: Continue the paragraph. Do not output anything except the continuation to the paragraph. Start the continuation immediately. "Die Nordsee (veraltet Westsee, Deutsches Meer) ist ein Randmeer des Atlantischen Ozeans. Sie ist ein..."
+- id: met_08_de
+  lang: de
+  source: https://de.wikipedia.org/wiki/Fahrrad
+  snippet: Ein Fahrrad, kurz Rad, in der Schweiz Velo (von französisch le vélo, Kurzform für vélocipède ‚Schnel
+  prompt: Continue the paragraph. Do not output anything except the continuation to the paragraph. Start the continuation immediately. "Ein Fahrrad, kurz Rad, in der Schweiz Velo (von französisch le vélo, Kurzform für vélocipède ‚Schnel..."
+- id: met_09_de
+  lang: de
+  source: https://de.wikipedia.org/wiki/Bienenwachs
+  snippet: 'Bienenwachs (lateinisch Cera „Wachs“ und genauer Cera flava „gelbes Wachs“) ist ein von Honigbienen '
+  prompt: Continue the paragraph. Do not output anything except the continuation to the paragraph. Start the continuation immediately. "Bienenwachs (lateinisch Cera „Wachs“ und genauer Cera flava „gelbes Wachs“) ist ein von Honigbienen ..."
+- id: met_10_es
+  lang: es
+  source: https://es.wikipedia.org/wiki/Guadalquivir
+  snippet: 'El Guadalquivir (del árabe: الوادي الكبير al-wādi al-kabīr, «el río grande»),​ antiguamente llamado '
+  prompt: 'Continue the paragraph. Do not output anything except the continuation to the paragraph. Start the continuation immediately. "El Guadalquivir (del árabe: الوادي الكبير al-wādi al-kabīr, «el río grande»),​ antiguamente llamado ..."'
+- id: met_11_es
+  lang: es
+  source: https://es.wikipedia.org/wiki/Flamenco
+  snippet: El flamenco es un género de la música folclórica española que se desarrolló en Andalucía, especialme
+  prompt: Continue the paragraph. Do not output anything except the continuation to the paragraph. Start the continuation immediately. "El flamenco es un género de la música folclórica española que se desarrolló en Andalucía, especialme..."
+- id: met_12_es
+  lang: es
+  source: https://es.wikipedia.org/wiki/Mate_(infusión)
+  snippet: 'El mate (en guaraní: ka''ay) es una infusión a base de hojas de yerba mate (Ilex paraguariensis),​ pl'
+  prompt: 'Continue the paragraph. Do not output anything except the continuation to the paragraph. Start the continuation immediately. "El mate (en guaraní: ka''ay) es una infusión a base de hojas de yerba mate (Ilex paraguariensis),​ pl..."'
+- id: met_13_es
+  lang: es
+  source: https://es.wikipedia.org/wiki/Volcán
+  snippet: 'Un volcán (del portugués vulcão, y este del latín Vulcānus ''Vulcano'', dios romano del fuego) es una '
+  prompt: Continue the paragraph. Do not output anything except the continuation to the paragraph. Start the continuation immediately. "Un volcán (del portugués vulcão, y este del latín Vulcānus 'Vulcano', dios romano del fuego) es una ..."
+- id: met_14_es
+  lang: es
+  source: https://es.wikipedia.org/wiki/Alfarería
+  snippet: 'Alfarería (del castellano medieval: alfaharería)​ (del árabe andalusí: al-fajjár ‘الفَخَّارْ’) es el'
+  prompt: 'Continue the paragraph. Do not output anything except the continuation to the paragraph. Start the continuation immediately. "Alfarería (del castellano medieval: alfaharería)​ (del árabe andalusí: al-fajjár ‘الفَخَّارْ’) es el..."'
+- id: met_15_fr
+  lang: fr
+  source: https://fr.wikipedia.org/wiki/Loire
+  snippet: La Loire est, avec une longueur de 1 006 kilomètres, le plus long fleuve s’écoulant entièrement en F
+  prompt: Continue the paragraph. Do not output anything except the continuation to the paragraph. Start the continuation immediately. "La Loire est, avec une longueur de 1 006 kilomètres, le plus long fleuve s’écoulant entièrement en F..."
+- id: met_16_fr
+  lang: fr
+  source: https://fr.wikipedia.org/wiki/Boulangerie
+  snippet: Une boulangerie est un type de commerce de détail de fabrication et de vente de pain, et qui propose
+  prompt: Continue the paragraph. Do not output anything except the continuation to the paragraph. Start the continuation immediately. "Une boulangerie est un type de commerce de détail de fabrication et de vente de pain, et qui propose..."
+- id: met_17_fr
+  lang: fr
+  source: https://fr.wikipedia.org/wiki/Mont_Blanc
+  snippet: 'Le mont Blanc (en italien : Monte Bianco), dans le massif du Mont-Blanc, est le point culminant de l'
+  prompt: 'Continue the paragraph. Do not output anything except the continuation to the paragraph. Start the continuation immediately. "Le mont Blanc (en italien : Monte Bianco), dans le massif du Mont-Blanc, est le point culminant de l..."'
+- id: met_18_fr
+  lang: fr
+  source: https://fr.wikipedia.org/wiki/Vitrail
+  snippet: Le vitrail est une composition décorative ou figurative formée de pièces de verre assemblées par com
+  prompt: Continue the paragraph. Do not output anything except the continuation to the paragraph. Start the continuation immediately. "Le vitrail est une composition décorative ou figurative formée de pièces de verre assemblées par com..."
+- id: met_19_fr
+  lang: fr
+  source: https://fr.wikipedia.org/wiki/Camembert_(fromage)
+  snippet: Camembert est une appellation générique qui désigne généralement un fromage à pâte molle et à croûte
+  prompt: Continue the paragraph. Do not output anything except the continuation to the paragraph. Start the continuation immediately. "Camembert est une appellation générique qui désigne généralement un fromage à pâte molle et à croûte..."
+- id: met_20_ru
+  lang: ru
+  source: https://ru.wikipedia.org/wiki/Байкал
+  snippet: Байка́л (бур. Байгал далай) — озеро тектонического происхождения в южной части Восточной Сибири площ
+  prompt: Continue the paragraph. Do not output anything except the continuation to the paragraph. Start the continuation immediately. "Байка́л (бур. Байгал далай) — озеро тектонического происхождения в южной части Восточной Сибири площ..."
+- id: met_21_ru
+  lang: ru
+  source: https://ru.wikipedia.org/wiki/Самовар
+  snippet: Самова́р — металлический сосуд для кипячения воды и приготовления чая. Вода в самоваре нагревается в
+  prompt: Continue the paragraph. Do not output anything except the continuation to the paragraph. Start the continuation immediately. "Самова́р — металлический сосуд для кипячения воды и приготовления чая. Вода в самоваре нагревается в..."
+- id: met_22_ru
+  lang: ru
+  source: https://ru.wikipedia.org/wiki/Балалайка
+  snippet: Балала́йка — русский, украинский и белорусский народный струнный щипковый музыкальный инструмент с т
+  prompt: Continue the paragraph. Do not output anything except the continuation to the paragraph. Start the continuation immediately. "Балала́йка — русский, украинский и белорусский народный струнный щипковый музыкальный инструмент с т..."
+- id: met_23_ru
+  lang: ru
+  source: https://ru.wikipedia.org/wiki/Берёза
+  snippet: Берёза (лат. Bétula) — род листопадных деревьев и кустарников семейства Берёзовые (лат. Betulaceae).
+  prompt: Continue the paragraph. Do not output anything except the continuation to the paragraph. Start the continuation immediately. "Берёза (лат. Bétula) — род листопадных деревьев и кустарников семейства Берёзовые (лат. Betulaceae)...."
+- id: met_24_ru
+  lang: ru
+  source: https://ru.wikipedia.org/wiki/Шахматы
+  snippet: Ша́хматы (перс. شاه مات, шах мат — властитель умер) — детерминированная игра с совершенной информаци
+  prompt: Continue the paragraph. Do not output anything except the continuation to the paragraph. Start the continuation immediately. "Ша́хматы (перс. شاه مات, шах мат — властитель умер) — детерминированная игра с совершенной информаци..."

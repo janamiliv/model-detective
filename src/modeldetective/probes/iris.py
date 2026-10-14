@@ -115,6 +115,10 @@ def parse_response(text: str, probe: Probe) -> Parsed:
             return Parsed("", invalid, len(checked), None)
         digits = m.group(0).lstrip("-")
         return Parsed(digits, invalid, len(checked), int(m.group(0)))
+    if probe.parser == "raw":
+        # One Token battery: keep the response; normalization happens in probes/one_token.py.
+        t = text.strip()
+        return Parsed(t, invalid, len(checked), None)
     if probe.parser == "number_last":
         found = _NUMBER_RE.findall(text)
         if not found:

@@ -8,6 +8,7 @@ Failed requests are recorded as rows with ``error`` set, never dropped.
 from __future__ import annotations
 
 import concurrent.futures as cf
+import json
 import time
 import zlib
 from dataclasses import dataclass
@@ -52,8 +53,13 @@ def collect_cell(
     out_dir: Path,
     parallel: int = 8,
     system_prompt: str | None = None,
+    n_logprobs: int = 0,
 ) -> Path:
-    """Sample ``cell.n`` responses from an already-running server. Skips if the file exists."""
+    """Sample ``cell.n`` responses from an already-running server. Skips if the file exists.
+
+    With ``n_logprobs`` > 0 the per-token top-k logprobs are stored as a JSON string column
+    (``logprobs_json``) for the oracle distance on one-token probes (prereg section 6).
+    """
     out_dir.mkdir(parents=True, exist_ok=True)
     out = out_dir / f"{cell.label}.parquet"
     if out.exists():
@@ -84,7 +90,7 @@ def collect_cell(
         }
         try:
             with LlamaClient(server.base_url) as c:
-                r = c.chat(messages, samp, seed=seed, extra=NO_THINK)
+                r = c.chat(messages, samp, seed=seed, extra=NO_THINK, n_logprobs=n_logprobs)
             parsed = parse_response(r.text, probe)
             row.update(
                 response_raw=r.text,
@@ -92,8 +98,10 @@ def collect_cell(
                 parse_success=parsed.parse_success,
                 invalid_rate=parsed.invalid_rate,
                 number_value=parsed.number_value,
+                echo=parsed.echo,
                 n_tokens=r.n_tokens,
                 finish_reason=r.finish_reason,
+                logprobs_json=json.dumps(r.logprobs) if n_logprobs and r.logprobs else None,
                 error=None,
             )
         except Exception as e:
@@ -103,8 +111,10 @@ def collect_cell(
                 parse_success=False,
                 invalid_rate=None,
                 number_value=None,
+                echo=False,
                 n_tokens=None,
                 finish_reason=None,
+                logprobs_json=None,
                 error=f"{type(e).__name__}: {e}",
             )
         row["latency"] = time.perf_counter() - t0

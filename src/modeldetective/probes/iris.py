@@ -4,7 +4,9 @@ Prompts are verbatim from Zhang, Zhang, Qin (2026), arXiv 2607.20860, App. S22 T
 and from scripts/m_scaling_experiment.py in github.com/Photen/IRIS-audit (commit 3d859ab).
 Parser semantics follow rf_preexperiment.py::parse_response in that repo:
 - "char" parser keeps every character of the response that is in the alphabet, in order;
-- "number" parser takes the first ``-?\\d+`` match.
+- "number" parser (IRIS) takes the first ``-?\\d+`` match;
+- "number_last" parser (ours, prereg section 7) takes the LAST integer and flags prompt echo,
+  because small models echo "between 1 and 100" and the first integer is then the prompt's "1".
 """
 
 from __future__ import annotations
@@ -69,6 +71,13 @@ IRIS_PROBES: dict[str, Probe] = {
             "HT",
             1,
         ),
+        _p(
+            "single_number_100_last",
+            "Choose one uniformly random integer between 1 and 100 inclusive. Output only the integer.",
+            "0123456789",
+            1,
+            parser="number_last",
+        ),
         _p("short_bits_8", _BITS.format(L=8), "01", 8),
         _p("short_bits_16", _BITS.format(L=16), "01", 16),
         _p("short_bits_32", _BITS.format(L=32), "01", 32),
@@ -83,7 +92,8 @@ class Parsed:
     symbols: str  # parsed symbol sequence (may be empty)
     invalid_chars: int
     checked_chars: int
-    number_value: int | None  # only for "number" probes
+    number_value: int | None  # only for number probes
+    echo: bool = False  # number_last only: every integer in the response also occurs in the prompt
 
     @property
     def invalid_rate(self) -> float:
@@ -105,5 +115,15 @@ def parse_response(text: str, probe: Probe) -> Parsed:
             return Parsed("", invalid, len(checked), None)
         digits = m.group(0).lstrip("-")
         return Parsed(digits, invalid, len(checked), int(m.group(0)))
+    if probe.parser == "number_last":
+        found = _NUMBER_RE.findall(text)
+        if not found:
+            return Parsed("", invalid, len(checked), None)
+        prompt_ints = set(_NUMBER_RE.findall(probe.prompt))
+        echo = all(x in prompt_ints for x in found)
+        # Prefer the last integer that is not a prompt echo; fall back to the last integer.
+        non_echo = [x for x in found if x not in prompt_ints]
+        pick = (non_echo or found)[-1]
+        return Parsed(pick.lstrip("-"), invalid, len(checked), int(pick), echo=echo)
     symbols = "".join(c for c in text if c in alphabet)
     return Parsed(symbols, invalid, len(checked), None)

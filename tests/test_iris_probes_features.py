@@ -65,3 +65,17 @@ def test_content_only_drops_length_and_counts() -> None:
     assert "count_0" not in cols and "freq_0" in cols
     assert "entropy" in cols and "trans_0_1" in cols
     assert len(cols) < len(f)
+
+
+def test_number_last_parser_skips_prompt_echo() -> None:
+    last = IRIS_PROBES["single_number_100_last"]
+    echo = "Choose one uniformly random integer between 1 and 100 inclusive. The answer is: 42."
+    p = parse_response(echo, last)
+    assert p.number_value == 42 and not p.echo
+    # IRIS first-integer rule returns the echoed 1 on the same text
+    assert parse_response(echo, NUM100).number_value == 1
+    only_echo = "between 1 and 100 inclusive, so any number from 1 to 100 works."
+    q = parse_response(only_echo, last)
+    assert q.echo and q.number_value == 100  # falls back to the last integer, flagged
+    assert parse_response("Sure! **57**", last).number_value == 57
+    assert parse_response("no digits", last).number_value is None

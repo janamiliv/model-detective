@@ -85,3 +85,9 @@ Running log of decisions and deviations. Newest at the bottom. Format: date, dec
 **Seed determinism pre-check (prereg §4) passed on both backends:** 20 same-seed requests, serial and 4-way concurrent, CPU and CUDA, each gave exactly one distinct text. Seeds are therefore true replay handles on this build, which is also why pools must have disjoint seeds.
 
 **Pinned revisions:** Qwen3-1.7B 70d244cc86ccca08cf5af4e1e306ecf908b1ad5e; Qwen3-4B 1cfa9a7208912126459214e8b04321603b3df60c (to be written into configs/models.yaml with hashes once built).
+
+**Qwen3 1.7B: all seven files built and smoke-tested.** Coherent down to Q3_K_M; Q2_K degrades to word salad.
+
+**Number parser for Phase 3 implemented** (`single_number_100_last`, parser `number_last`: last non-echo integer, `echo` flag). On the Phase 1 data it recovers usable in-range answers for 48% (f16), 38% (Q4_K_M) and 43% (f16 null) of responses; the remainder never state a number within the 48-token cap. That is below the prereg's 50% parse threshold at 0.6B, so the number probe remains secondary and its 0.6B cells will be flagged. The IRIS first-integer parser is kept unchanged for the baseline comparison.
+
+**`configs/models.yaml` is now generated** from the local manifests by `quantize/sync_config.py` (hashes, bits/weight, revisions); notes stay hand-edited.

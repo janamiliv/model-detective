@@ -14,6 +14,8 @@ quantization measurably harms task behavior?
 
 - **H1 (bit-width curve).** Detectability rises monotonically as bit-width falls. Q8_0 is not
   detectable within 100 queries on the primary probe at 80% power; Q4_K_M and below are.
+  Monotonicity is assessed descriptively (six variants cannot support a formal trend test); the
+  two threshold claims are the testable parts.
 - **H2 (detection-harm gap).** Quantization becomes detectable (queries-to-detect at 80% power
   ≤ 100) at a higher bit-width than the one where harm becomes significant (defined in §5).
   The reverse ordering is an equally reportable outcome.
@@ -33,6 +35,10 @@ quantization measurably harms task behavior?
   matrix (plain K-quants) so that the variants differ only in bit-width.
 - Null control: a second, independent f16 run (fresh server process, disjoint seeds) in every
   comparison.
+- Degenerate variants: if a variant's parse-success rate on the primary probe is below 50%, or its
+  responses are more than 50% repeated strings, it is labeled *degenerate*. Its detection result
+  is still reported but flagged, because detecting broken output is trivial; the harm metrics
+  (§10) carry the interpretation for that variant.
 
 ## 4. Runtime and sampler (fixed for all cells)
 
@@ -42,6 +48,9 @@ quantization measurably harms task behavior?
 - Sampler: temperature 1.0, top_p 1.0, top_k 0, min_p 0, repeat_penalty 1.0. Qwen3 thinking off.
 - Seeds: unique per request, derived deterministically from (run_id, probe, index); recorded.
 - 8 server slots, 8 threads.
+- Pre-check before collection: 20 requests with identical seed and prompt must return identical
+  text on the chosen backend; if not, the backend is documented as non-deterministic and seeds are
+  treated as labels only.
 
 ## 5. Probes
 
@@ -54,12 +63,18 @@ quantization measurably harms task behavior?
   prompts (25 short continuation prompts, 50-token cap) for the Hamming-MMD detector.
 - Optional extension, clearly labeled: One Token tasks in Serbian (Latin and Cyrillic).
 
-## 6. Sample sizes
+## 6. Sample sizes and compute budget
 
 - Primary probe: 2,000 responses per (model, variant), plus 2 × 2,000 f16 (reference and null).
-- Other IRIS probes: 1,000 per cell. One Token: 1,000 per (model, variant, task, language) for
-  en; 300 for ru/zh/ar. MET prompts: 40 per prompt per variant (1,000 per variant).
+- Other IRIS probes (`short_digits_8`, `short_bits_32`, `single_number_100`): 1,000 per cell.
+- One Token battery: 300 per (model, variant, task) in English for all variants; ru/zh/ar at 100
+  per cell for f16, Q8_0, Q4_K_M and Q2_K only. (Full counts for all four languages on every
+  variant would be about 19,000 requests per variant, roughly 11 hours per model size on CPU;
+  this is the trade-off made.)
+- MET-style prompts: 40 per prompt per variant (1,000 per variant).
 - Logprobs: top-20 next-token logprobs recorded for every one-token cell (oracle distance).
+- Per model size this is about 70,000 requests: roughly 5 hours on CPU at 0.6B. 1.7B and 4B run
+  on CUDA.
 
 ## 7. Parsing and exclusion rules
 
@@ -80,15 +95,39 @@ quantization measurably harms task behavior?
   primary set**, full features secondary. Tell-rate protocol as in `detect/tell_rate.py`.
 - (d) Optional: rank-uniformity test on local logits.
 
+**Per-episode statistic for an episode of m responses:**
+- (a) JSD between the empirical answer distribution of the m responses and the reference
+  distribution estimated from the reference training split; for multi-cell batteries, the mean
+  over cells.
+- (b) The MMD statistic between the m responses and a fixed reference sample of equal size,
+  with the decision threshold from the null calibration below (no per-episode permutation test,
+  which would be too costly at 1,000 episodes per budget).
+- (c) The mean of the per-response score s(y) = −log P̂(reference | y) over the m responses.
+
 ## 9. Primary metric and statistics
 
-- **Queries-to-detect**: smallest m in {1, 2, 4, 8, 16, 32, 64, 128, 256} at which power ≥ 0.80
-  (and ≥ 0.95) at alpha = 0.05, where an episode is m responses, the decision statistic is the
-  mean per-response score, the threshold is calibrated on a disjoint null split, and power is
-  measured on held-out data. Permutation or exact calibration; no normal approximation without a
-  check. 1,000 bootstrap resamples for 95% CIs.
-- Controls on every plot: f16-vs-f16 null (FPR must be within [0.02, 0.08] at nominal 0.05),
-  and the content-only versus full comparison.
+- **Data split (per model, probe).** The f16 reference pool (run 1) is split 50/25/25 into
+  *train* (fits the classifier or the reference distribution), *calibrate* (sets the decision
+  threshold at the 1 − alpha quantile of the null episode statistic), and *test-ref*. The f16
+  null pool (run 2) is never used for training or calibration; it is only scored. Each variant
+  pool is split 50/50: the first half joins *train* for the classifier (detector c only), the
+  second half is *test-sub*. Splits are stratified and drawn with a fixed seed (20261014) and
+  the whole procedure is repeated over 20 random splits.
+- **Episodes.** For each budget m in {1, 2, 4, 8, 16, 32, 64, 128, 256}, 1,000 episodes are drawn
+  from *calibrate* (to set the threshold), from *test-ref* and from the null pool (to measure
+  the false-positive rate), and from *test-sub* (to measure power). Within an episode responses
+  are drawn without replacement; across episodes with replacement, so episodes overlap at large
+  m. CIs therefore come from a bootstrap over the underlying responses (1,000 resamples), not
+  over episodes, and are reported as 95% percentile intervals.
+- **Queries-to-detect**: smallest m at which power ≥ 0.80 (and ≥ 0.95) at alpha = 0.05.
+  If power never reaches 0.80 within m = 256, report "> 256".
+- Calibration is by the empirical null quantile (exact, no normal approximation). Analysis seeds
+  are fixed and recorded in the results JSON.
+- Controls on every plot: f16-vs-f16 null (FPR must be within [0.02, 0.08] at nominal 0.05 at
+  every m; a violation is reported and the cell is marked unreliable), and the content-only
+  versus full comparison.
+- Multiple comparisons: the headline is one probe, one detector (c, content-only), one metric.
+  Everything else is reported as secondary and exploratory, without correction, and labeled so.
 - Secondary: single-query AUROC, equal error rate at fixed m.
 
 ## 10. Harm metrics (H2)

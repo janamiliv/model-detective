@@ -1,0 +1,44 @@
+# Probe battery (prereg section 5). Prompts for IRIS probes live in code
+# (src/modeldetective/probes/iris.py, verbatim from arXiv 2607.20860); the One Token battery is
+# the verbatim author file configs/one_token_prompts.zenodo.json. This file says which cells are
+# collected, how many samples, and which is primary.
+
+primary:
+  family: iris
+  probe: short_bits_16
+  n_per_pool: 2000         # per (model, variant); f16 gets two pools (reference + null)
+  max_tokens: 88
+  role: decides H1, H2, H4
+
+secondary:
+  - family: iris
+    probe: short_digits_8
+    n_per_pool: 1000
+    max_tokens: 72
+  - family: iris
+    probe: short_bits_32
+    n_per_pool: 1000
+    max_tokens: 136
+  - family: iris
+    probe: single_number_100_last   # same prompt as IRIS c_{100,1}; last-integer parser with echo flag
+    n_per_pool: 1000
+    max_tokens: 48
+    note: expected to fall below the 50% parse threshold at 0.6B (Phase 1 finding); reported, flagged.
+  - family: one_token
+    source: configs/one_token_prompts.zenodo.json
+    languages: {en: all_variants, ru: subset, zh: subset, ar: subset}
+    subset_variants: [f16, Q8_0, Q4_K_M, Q2_K]
+    n_per_cell: {en: 300, ru: 100, zh: 100, ar: 100}
+    max_tokens: 16
+    system_prompt: battery   # the battery's own per-language system prompt
+    logprobs_top_k: 20       # oracle distance (prereg section 6)
+  - family: met_natural
+    prompts: configs/met_prompts.yaml   # 25 short continuation prompts; generated in Phase 3 step 1
+    n_per_prompt_per_pool: 40
+    max_tokens: 50
+    detector: mmd_hamming
+
+optional_extension:
+  - family: one_token
+    languages: [sr-Latn, sr-Cyrl]
+    status: not started; clearly labeled extension if done

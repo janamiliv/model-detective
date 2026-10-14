@@ -1,0 +1,27 @@
+# The one sampler configuration used for every collection cell (prereg section 4).
+# llama-server defaults (top_k 40, top_p 0.95, min_p 0.05) are never used; every field is sent explicitly.
+primary:
+  temperature: 1.0
+  top_p: 1.0
+  top_k: 0          # 0 = disabled in llama.cpp
+  min_p: 0.0
+  repeat_penalty: 1.0
+  seed_policy: disjoint_per_pool   # see collect/runner.py::seed_for
+  thinking: false    # Qwen3: chat_template_kwargs.enable_thinking = false
+  system_prompt: null  # IRIS probes: none. One Token battery: the battery's own system prompt.
+
+# Optional sensitivity check (secondary, exploratory): IRIS's effective sampler is unrecorded
+# (Ollama default); this approximates a common default and tests whether truncation changes results.
+sensitivity_topk20:
+  temperature: 1.0
+  top_p: 1.0
+  top_k: 20
+  min_p: 0.0
+  repeat_penalty: 1.0
+
+# ONNX Runtime genai equivalent of `primary` (serve/onnx_runner.py)
+onnx_primary:
+  do_sample: true
+  temperature: 1.0
+  top_k: 0
+  top_p: 1.0

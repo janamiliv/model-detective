@@ -38,6 +38,7 @@ baseline = [
 onnx = [
     "onnxruntime-genai==0.18.0",
     "onnx>=1.17",
+    "onnx-ir>=0.1",  # undeclared dependency of the genai model builder
 ]
 # Demo app (Phase 8).
 app = [

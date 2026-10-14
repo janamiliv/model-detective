@@ -103,3 +103,7 @@ Running log of decisions and deviations. Newest at the bottom. Format: date, dec
 **ONNX INT4 (RTN, block 32) export done:** 375 MiB, about 4.2 bits/weight overall, so this mode quantizes the embeddings too (inferred from size). Quality is harsher than GGUF Q4_K_M: garbled factual answer, 16-bit probe parses 4/10 because it inserts spaces. Manifests in `models/qwen3-0.6b/onnx/manifests/`, summary in `results/onnx_variants.md`.
 
 **Phase 2 gate: PASSED (2026-10-15).** 21 GGUF variants across three sizes plus two ONNX variants at 0.6B, all load and generate, manifests complete, `configs/models.yaml` generated from manifests. Time spent on the ONNX track: about two hours, within the half-day box. Open for Phase 3: the pre-registration freeze (owner's confirmation), then collection.
+
+## 2026-10-15 — Storage: model files moved to the external drive
+
+**`models/` (54.2 GB, 135 files) moved to `E:\model-detective\models` (WD My Passport USB HDD, 1.8 TB) with robocopy; an NTFS junction at `models/` keeps every path in configs and code unchanged.** D: went from 24 GB to 78 GB free. `tools/` (llama.cpp binaries) and `.venv` stay on the NVMe for start-up speed. Cost: model loads read from USB (about 65–75 MB/s), so a 4B f16 server start takes roughly two minutes instead of seconds; that happens once per pool. Integrity: every manifest hash re-verified after the move with `quantize/verify.py` (result below). Lesson from the move: robocopy preallocates destination files, so hashing or sizing a file mid-copy is meaningless; verify only after the job ends.

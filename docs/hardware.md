@@ -14,7 +14,7 @@ Recorded 2026-10-08/09. All local experiments run on this machine unless DECISIO
 | NVIDIA driver | 535.98 (CUDA 12.2) until 2026-10-14; **617.42 (CUDA 13.4) from 2026-10-14** |
 | Disk | D: 182 GB, 81 GB free at start |
 
-Note: desktop apps (Discord, browsers) hold about 1.7 GB of VRAM when open. Close them before collection runs.
+Note: desktop apps (chat clients, browsers) hold about 1.7 GB of VRAM when open. Close them before collection runs.
 
 ## What fits in 4 GB VRAM
 
@@ -71,7 +71,7 @@ Model: `Qwen/Qwen3-0.6B-GGUF`, file `Qwen3-0.6B-Q8_0.gguf`, HF revision `23749fe
 | CUDA | f16 | 183 samples/min, 84 gen tok/s | GPU ran at 855 MHz / 22 W under load (max 1785 MHz / 50 W) |
 | CUDA | Q4_K_M | 244 samples/min, 138 gen tok/s | |
 
-The GPU is not faster than the CPU at 0.6B under the conditions measured: Windows "Balanced" power plan, and other apps (Stremio video decode at ~33% SM, Wallpaper Engine) sharing the GPU. No thermal or power-cap throttling was flagged. For collection runs: close GPU-using apps and consider the High performance power plan. The GPU matters more at 1.7B and 4B, where CPU decode slows down faster than GPU decode.
+The GPU is not faster than the CPU at 0.6B under the conditions measured: Windows "Balanced" power plan, and other apps (a video player decoding at ~33% SM, an animated wallpaper) sharing the GPU. No thermal or power-cap throttling was flagged. For collection runs: close GPU-using apps and consider the High performance power plan. The GPU matters more at 1.7B and 4B, where CPU decode slows down faster than GPU decode.
 
 **Backend policy (prereg §4):** every comparison uses one backend. Phase 1 cells were collected on CPU and re-collected on CUDA as a cross-backend check (see `results/phase1_iris_repro*.json`).
 

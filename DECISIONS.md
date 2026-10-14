@@ -66,7 +66,7 @@ Running log of decisions and deviations. Newest at the bottom. Format: date, dec
 
 **Driver 535.98 → 617.42 (CUDA 13.4).** The pinned b11429 CUDA-12.4 binary now runs: 29/29 layers offload, greedy output identical to CPU, 82 tok/s single-stream. Phase 0 GPU caveat closed.
 
-**GPU is not a throughput win at 0.6B under current conditions.** Batched sampling: CUDA f16 183/min vs CPU ~250/min; CUDA Q4_K_M 244/min. Under load the GPU sat at 855 MHz / 22 W of 1785 MHz / 50 W with no throttle flags, on the Balanced power plan, while Stremio was decoding video on it. Decision: keep CPU as the default backend for 0.6B collection; use CUDA for 1.7B and 4B where it should pull ahead; never mix backends within one comparison. Before long GPU runs, close GPU-using apps and consider the High performance power plan (user's call; not changed by the agent).
+**GPU is not a throughput win at 0.6B under current conditions.** Batched sampling: CUDA f16 183/min vs CPU ~250/min; CUDA Q4_K_M 244/min. Under load the GPU sat at 855 MHz / 22 W of 1785 MHz / 50 W with no throttle flags, on the Balanced power plan, while a video player was decoding on it. Decision: keep CPU as the default backend for 0.6B collection; use CUDA for 1.7B and 4B where it should pull ahead; never mix backends within one comparison. Before long GPU runs, close GPU-using apps and consider the High performance power plan (user's call; not changed by the agent).
 
 **Phase 1 cells re-collected on CUDA** (`BACKEND=cuda`, separate `data/phase1_iris_cuda/` and `results/phase1_iris_repro_cuda.json`) as a cross-backend check of the baseline. Result appended below.
 

@@ -107,3 +107,5 @@ Running log of decisions and deviations. Newest at the bottom. Format: date, dec
 ## 2026-10-15 — Storage: model files moved to the external drive
 
 **`models/` (54.2 GB, 135 files) moved to `E:\model-detective\models` (WD My Passport USB HDD, 1.8 TB) with robocopy; an NTFS junction at `models/` keeps every path in configs and code unchanged.** D: went from 24 GB to 78 GB free. `tools/` (llama.cpp binaries) and `.venv` stay on the NVMe for start-up speed. Cost: model loads read from USB (about 65–75 MB/s), so a 4B f16 server start takes roughly two minutes instead of seconds; that happens once per pool. Integrity: every manifest hash re-verified after the move with `quantize/verify.py` (result below). Lesson from the move: robocopy preallocates destination files, so hashing or sizing a file mid-copy is meaningless; verify only after the job ends.
+
+**Pre-registration frozen (2026-10-15), tag `prereg-v1`.** Owner approved the document as revised (data split, episodes, per-detector statistics, degenerate-variant rule, disjoint seeds, budget). Phase 3 collection starts now on CPU for 0.6B, primary probe first.

@@ -1,8 +1,8 @@
-# Pre-registration — DRAFT for review, not yet frozen
+# Pre-registration — FROZEN 2026-10-15 (tag `prereg-v1`)
 
-Status: drafted 2026-10-14 after the Phase 1 baseline reproduction. To be reviewed by the project
-owner and then frozen by a commit tagged `prereg-v1` before any Phase 3 collection beyond the
-Phase 1 cells. Any change after the freeze goes in the dated "Deviations" section at the end.
+Status: drafted 2026-10-14 after the Phase 1 baseline reproduction, reviewed and approved by the
+project owner, frozen on 2026-10-15 before any Phase 3 collection. The body below is not edited
+after this point; any change goes in the dated "Deviations" section at the end.
 
 ## 1. Question
 

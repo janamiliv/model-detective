@@ -149,4 +149,14 @@ results; truncate axes.
 
 ## Deviations (dated)
 
-None yet.
+- **2026-10-15, before any sweep data was analysed.** Section 3's degenerate-variant rule said
+  "more than 50% repeated strings". On the Phase 1 pools Q4_K_M at 0.6B already has only 43%
+  distinct strings on the primary probe while parsing at 99.5% and answering coherently; its
+  most common string is 26% of responses. Repetition is a quantization effect the detector is
+  meant to exploit, not broken output. Rule changed to: parse-success rate below 50% **or a
+  single string above 50% of responses**. The distinct-string fraction is still reported for
+  every pool.
+- **2026-10-15, same time.** Section 9 did not say what to do when a budget m exceeds what the
+  calibration split can support. Added: a budget is *reliable* only if the null FPR is within
+  [0.02, 0.08] **and** m ≤ n_calibrate / 4 (so that resampled episodes are distinct).
+  Queries-to-detect is taken over reliable budgets only; unreliable budgets are still shown.

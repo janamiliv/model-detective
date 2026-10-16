@@ -64,6 +64,8 @@ class LlamaServer:
             raise FileNotFoundError(f"llama-server binary not found: {self.binary}")
         if not self.model_path.exists():
             raise FileNotFoundError(f"model not found: {self.model_path}")
+        if self.log_path:
+            self.log_path.parent.mkdir(parents=True, exist_ok=True)
         log = open(self.log_path, "ab") if self.log_path else subprocess.DEVNULL  # noqa: SIM115
         self._proc = subprocess.Popen(
             self.command(), stdout=log, stderr=subprocess.STDOUT, env=os.environ.copy()

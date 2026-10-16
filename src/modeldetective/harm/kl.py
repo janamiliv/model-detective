@@ -63,10 +63,10 @@ def parse_kl_output(log: str) -> dict:
     """Pull the summary numbers out of llama-perplexity's KL report; raise if absent."""
     out: dict = {}
     for key, pat in {
-        "mean_kl": r"Mean\s+KLD:\s*([0-9.]+)\s*±\s*([0-9.]+)",
-        "max_kl": r"Maximum\s+KLD:\s*([0-9.]+)",
-        "kl_99pct": r"99\.9%\s+KLD:\s*([0-9.]+)|99\.0%\s+KLD:\s*([0-9.]+)",
-        "median_kl": r"Median\s+KLD:\s*([0-9.]+)",
+        "mean_kl": r"Mean\s+KLD:\s*(-?[0-9.]+)\s*±\s*([0-9.]+)",
+        "max_kl": r"Maximum\s+KLD:\s*(-?[0-9.]+)",
+        "kl_99pct": r"99\.0%\s+KLD:\s*(-?[0-9.]+)",
+        "median_kl": r"Median\s+KLD:\s*(-?[0-9.]+)",
         "top1_agreement": r"Same top p:\s*([0-9.]+)\s*±\s*([0-9.]+)\s*%|Same top:\s*([0-9.]+)",
         "mean_ppl_ratio": r"Mean\s+ln\(PPL\(Q\)/PPL\(base\)\):\s*([-0-9.]+)",
     }.items():

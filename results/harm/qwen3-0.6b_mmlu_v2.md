@@ -28,3 +28,23 @@ flip rate, or the accuracy-drop CI excludes zero (in the harmful direction).
   harm in the accuracy sense, but 8.1% of answers change.
 - **Unreadable answers vary by variant** (65–518). They count as wrong, so part of the accuracy
   drop at Q5_K_M and Q2_K is format breakage rather than wrong knowledge. Reported, not corrected.
+
+## KL divergence of next-token distributions vs f16
+
+`llama-perplexity --kl-divergence`, 16 chunks × 512 tokens of WikiText-2 test (`configs/kl_text.txt`),
+CUDA. Raw: `qwen3-0.6b_kl.json`.
+
+| Variant | Mean KL (nats) ± SE | Median KL | 99th pct KL | Same top-1 token |
+|---|---|---|---|---|
+| f16 (self, null) | −0.000015 (rounding) | −0.000014 | 0.000 | 100.0% |
+| Q8_0 | 0.0032 ± 0.0001 | 0.0025 | 0.017 | 96.5% |
+| Q6_K | 0.0135 ± 0.0003 | 0.0100 | 0.073 | 93.4% |
+| Q5_K_M | 0.0376 ± 0.0010 | 0.0252 | 0.217 | 89.6% |
+| Q4_K_M | 0.1130 ± 0.0025 | 0.0766 | 0.728 | 82.1% |
+| Q3_K_M | 0.4370 ± 0.0080 | 0.3007 | 2.474 | 66.9% |
+| Q2_K | 2.9091 ± 0.0330 | 2.4776 | 9.605 | 28.4% |
+
+KL rises monotonically with falling bit-width and tracks the flip rate. On the probe, detection
+starts between Q6_K (KL 0.013) and Q5_K_M (KL 0.038): at this size the 16-bit-string detector
+needs a mean next-token KL of roughly 0.02–0.04 nats before it can see the change within 125
+queries.

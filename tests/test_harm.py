@@ -60,3 +60,9 @@ def test_parse_kl_output() -> None:
     assert r["mean_kl"] == 0.012345 and r["mean_kl_se"] == 0.000123
     assert r["max_kl"] == 1.234567 and r["median_kl"] == 0.001234
     assert r["top1_agreement"] == 95.123
+
+
+def test_parse_kl_output_negative_rounding() -> None:
+    log = "Mean    KLD:  -0.000015 ±   0.000000\nMedian  KLD:  -0.000014\n99.0%   KLD:   0.000000\n"
+    r = parse_kl_output(log)
+    assert r["mean_kl"] == -0.000015 and r["median_kl"] == -0.000014 and r["kl_99pct"] == 0.0

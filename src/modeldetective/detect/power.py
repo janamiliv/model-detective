@@ -31,7 +31,11 @@ def episode_means(
     if n == 0:
         return np.full(n_episodes, np.nan)
     m_eff = min(m, n)
-    idx = np.stack([rng.choice(n, size=m_eff, replace=False) for _ in range(n_episodes)])
+    if m_eff == n:
+        return np.full(n_episodes, scores.mean())
+    # Vectorised sampling without replacement: the m smallest of n uniform keys per row.
+    keys = rng.random((n_episodes, n))
+    idx = np.argpartition(keys, m_eff - 1, axis=1)[:, :m_eff]
     return scores[idx].mean(axis=1)
 
 

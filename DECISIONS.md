@@ -125,3 +125,9 @@ Running log of decisions and deviations. Newest at the bottom. Format: date, dec
 **Finding: `short_digits_8` is not parseable at 0.6B for any variant.** All pools, both f16 runs included, wrap the digits in prose ("Sure! Here is..."); IRIS's char parser (≤25% non-alphabet characters) succeeds on 0–2.7% of responses (Q3_K_M 23%). Per prereg §7 the cell is below the 50% threshold and is reported as flagged, not used for any headline. It is a probe-at-this-size problem, not a quantization effect.
 
 **Bookkeeping fix for number probes:** `parse_success` (character rule) is always False for `single_number_100_last` because the response is mostly prose. For number probes the analysis will define success as "a non-echo integer in range was found" (the `number_value` and `echo` columns), as the prereg §7 parser intends.
+
+## 2026-10-16 — First headline result: 0.6B, primary probe
+
+Queries to 80% power (content-only, pre-registered protocol): Q8_0 > 125, Q6_K > 125, Q5_K_M 16, Q4_K_M 4, Q3_K_M 2, Q2_K 1 (degenerate, parse 0.6%). Null FPR 0.03–0.06 at all reliable budgets. H1 supported at 0.6B. Details and caveats (non-monotone power in m from the heavy-tailed mean statistic; m = 128/256 unreliable as pre-registered) in `results/sweep/cpu/qwen3-0.6b__short_bits_16.md`.
+
+**Analysis speed fix:** episode sampling vectorised (argpartition of uniform keys); one power curve ~10 s.

@@ -160,3 +160,9 @@ results; truncate axes.
   calibration split can support. Added: a budget is *reliable* only if the null FPR is within
   [0.02, 0.08] **and** m ≤ n_calibrate / 4 (so that resampled episodes are distinct).
   Queries-to-detect is taken over reliable budgets only; unreliable budgets are still shown.
+- **2026-10-16, after only the f16 reference's harm run, before any variant's.** Section 10 fixed
+  greedy decoding but not the answer extraction; the implementation used a 4-token cap and the
+  first character. Qwen3-0.6B answers "The correct answer is X", so 42% of reference answers were
+  cut off before the letter. Changed to a 24-token cap and: first character if it is a standalone
+  A-D, else the letter after "answer is" / "answer:". Run v1 is kept on disk as superseded
+  (`data/harm/cuda/`); all harm results come from v2 (`data/harm/cuda_v2/`).

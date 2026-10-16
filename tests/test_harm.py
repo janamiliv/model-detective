@@ -36,7 +36,11 @@ def test_format_prompt_and_parse_letter() -> None:
     assert "high school biology" in p and p.endswith("Answer:") and "D. d" in p
     assert parse_letter(" B") == "B"
     assert parse_letter("(c)") == "C"
-    assert parse_letter("The answer is A") is None  # first character rule, as pre-registered
+    assert parse_letter("The correct answer is B.") == "B"
+    assert parse_letter("The correct answer is **C**") == "C"
+    assert parse_letter("Answer: (D)") == "D"
+    assert parse_letter("A cat is an animal") is None  # word starting with A is not an answer
+    assert parse_letter("The question is asking about") is None
     assert parse_letter("") is None
 
 

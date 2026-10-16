@@ -14,6 +14,7 @@ import argparse
 import concurrent.futures as cf
 import json
 import os
+import re
 import time
 from pathlib import Path
 
@@ -25,14 +26,23 @@ from modeldetective.harm.mmlu import LETTERS, format_prompt, load_subset
 from modeldetective.serve import LlamaClient, LlamaServer, SamplerConfig
 
 OUT_ROOT = Path("data/harm")
+# v1 (2026-10-16, superseded): max_tokens=4 + first-character rule. Qwen3 answers "The correct
+# answer is X", so 42% of v1 answers were cut off before the letter. v2: 24 tokens + the parser
+# below. Logged in prereg Deviations before any variant's harm result was examined.
+HARM_VERSION = "v2"
 GREEDY = SamplerConfig(
-    temperature=0.0, top_p=1.0, top_k=1, min_p=0.0, repeat_penalty=1.0, max_tokens=4
+    temperature=0.0, top_p=1.0, top_k=1, min_p=0.0, repeat_penalty=1.0, max_tokens=24
 )
+_ANSWER_IS = re.compile(r"answer\s*(?:is|:)?\s*[:\-]?\s*\**\(?([ABCD])\b", re.IGNORECASE)
 
 
 def parse_letter(text: str) -> str | None:
-    t = text.strip().lstrip("(").upper()
-    return t[0] if t and t[0] in LETTERS else None
+    """Letter A-D: first character if it is one; else the letter after 'answer is'; else None."""
+    t = text.strip().lstrip("(*").upper()
+    if t and t[0] in LETTERS and (len(t) == 1 or t[1] in ".):,\n*"):
+        return t[0]
+    m = _ANSWER_IS.search(text)
+    return m.group(1).upper() if m else None
 
 
 def eval_pool(
@@ -106,7 +116,7 @@ def main() -> None:
     a = ap.parse_args()
     models_cfg = yaml.safe_load(MODELS_CFG.read_text(encoding="utf-8"))
     questions = load_subset()
-    out_dir = OUT_ROOT / a.backend
+    out_dir = OUT_ROOT / f"{a.backend}_{HARM_VERSION}"
     for key in a.models:
         for pool in plan_pools(key, models_cfg):
             if a.variants and pool.variant not in a.variants:

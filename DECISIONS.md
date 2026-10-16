@@ -131,3 +131,11 @@ Running log of decisions and deviations. Newest at the bottom. Format: date, dec
 Queries to 80% power (content-only, pre-registered protocol): Q8_0 > 125, Q6_K > 125, Q5_K_M 16, Q4_K_M 4, Q3_K_M 2, Q2_K 1 (degenerate, parse 0.6%). Null FPR 0.03–0.06 at all reliable budgets. H1 supported at 0.6B. Details and caveats (non-monotone power in m from the heavy-tailed mean statistic; m = 128/256 unreliable as pre-registered) in `results/sweep/cpu/qwen3-0.6b__short_bits_16.md`.
 
 **Analysis speed fix:** episode sampling vectorised (argpartition of uniform keys); one power curve ~10 s.
+
+## 2026-10-16 — 0.6B harm (MMLU, harm v2) and the first H2 reading
+
+Flip rate vs f16 (null run 0.009): Q8_0 0.034, Q6_K 0.081, Q5_K_M 0.132, Q4_K_M 0.194, Q3_K_M 0.283, Q2_K 0.411; every variant's CI excludes the null. Accuracy drop significant from Q5_K_M down. Table: `results/harm/qwen3-0.6b_mmlu_v2.md`.
+
+**H2 at 0.6B (preliminary, KL pending):** under the pre-registered harm definition (flip rate OR accuracy), harm is significant already at Q8_0, while the primary-probe detector first reaches 80% power within 125 queries at Q5_K_M. So **harm precedes detectability** at this size: Q8_0 and Q6_K change answers measurably but cannot be detected from 16-bit strings. Under the accuracy-only definition, harm and detectability appear at the same level (Q5_K_M). The prereg names flip rate first, and PLAN.md calls this alternative "equally publishable"; it is reported as the H2 outcome for 0.6B, with the accuracy-only reading alongside.
+
+**Greedy decoding on CUDA with 8 slots is not deterministic** (two f16 runs flip 0.9% of answers). Kept as the null; noted as the measured size of pitfall #5.

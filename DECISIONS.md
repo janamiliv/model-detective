@@ -141,3 +141,7 @@ Flip rate vs f16 (null run 0.009): Q8_0 0.034, Q6_K 0.081, Q5_K_M 0.132, Q4_K_M 
 **Greedy decoding on CUDA with 8 slots is not deterministic** (two f16 runs flip 0.9% of answers). Kept as the null; noted as the measured size of pitfall #5.
 
 **0.6B KL divergence (16 × 512 tokens, CUDA):** Q8_0 0.0032, Q6_K 0.0135, Q5_K_M 0.038, Q4_K_M 0.113, Q3_K_M 0.437, Q2_K 2.91 nats; top-1 agreement 96.5% → 28.4%. Monotone in bit-width. The primary-probe detector first succeeds between KL 0.013 and 0.038. Figure: `results/figures/detection_vs_harm_qwen3-0.6b.png` (flip rate vs queries to detect). KL parser now accepts the slightly negative self-KL from rounding.
+
+## 2026-10-18 — 1.7B overnight run (core cells, CPU)
+
+Owner approved the core-cell cut for the scale-up (prereg Deviations, 2026-10-18): f16 ×2, Q8_0, Q4_K_M, Q2_K; primary probe + One Token battery; 40,000 requests, CPU (1.7B f16 does not fit 4 GB VRAM next to the desktop). `collect/night.py` runs both sweeps in sequence and holds a Windows execution-state request so the machine does not sleep; no power settings were changed. Launched detached so it survives the session.

@@ -166,3 +166,9 @@ results; truncate axes.
   cut off before the letter. Changed to a 24-token cap and: first character if it is a standalone
   A-D, else the letter after "answer is" / "answer:". Run v1 is kept on disk as superseded
   (`data/harm/cuda/`); all harm results come from v2 (`data/harm/cuda_v2/`).
+- **2026-10-18, before any 1.7B data.** Compute cut for 1.7B and 4B (PLAN.md Phase 7 cut: "run only
+  the variants needed to test the size trend"): pools f16 (reference + null), Q8_0, Q4_K_M, Q2_K;
+  probes: primary `short_bits_16` (2,000 per pool) and the One Token battery (unchanged counts).
+  Secondary IRIS probes and MET prompts are not collected at these sizes. Reason: 1.7B f16 does not
+  fit the 4 GB GPU, so everything runs on CPU; the full sweep would take days. 0.6B keeps the full
+  design. The owner approved this cut on 2026-10-18.

@@ -41,7 +41,14 @@ def cells_for_pool(pool, cfg: dict) -> list[tuple[Cell, str]]:  # type: ignore[n
     return out
 
 
-def run(models: list[str], backend: str, parallel: int, threads: int, dry_run: bool) -> None:
+def run(
+    models: list[str],
+    backend: str,
+    parallel: int,
+    threads: int,
+    dry_run: bool,
+    variants: list[str] | None = None,
+) -> None:
     models_cfg = yaml.safe_load(MODELS_CFG.read_text(encoding="utf-8"))
     cfg = one_token_cfg()
     sampler = load_sampler()
@@ -54,7 +61,7 @@ def run(models: list[str], backend: str, parallel: int, threads: int, dry_run: b
     out_dir = DATA_ROOT / backend / "one_token"
     total = 0
     for key in models:
-        for pool in plan_pools(key, models_cfg):
+        for pool in plan_pools(key, models_cfg, variants):
             cells = cells_for_pool(pool, cfg)
             todo = [(c, s) for c, s in cells if not (out_dir / f"{c.label}.parquet").exists()]
             total += sum(c.n for c, _ in cells)
@@ -105,9 +112,10 @@ def main() -> None:
     ap.add_argument("--backend", choices=["cpu", "cuda"], default="cpu")
     ap.add_argument("--parallel", type=int, default=8)
     ap.add_argument("--threads", type=int, default=8)
+    ap.add_argument("--variants", nargs="*", default=None, help="subset of quant types")
     ap.add_argument("--dry-run", action="store_true")
     a = ap.parse_args()
-    run(a.models, a.backend, a.parallel, a.threads, a.dry_run)
+    run(a.models, a.backend, a.parallel, a.threads, a.dry_run, a.variants)
 
 
 if __name__ == "__main__":

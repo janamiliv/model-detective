@@ -145,3 +145,7 @@ Flip rate vs f16 (null run 0.009): Q8_0 0.034, Q6_K 0.081, Q5_K_M 0.132, Q4_K_M 
 ## 2026-10-18 — 1.7B overnight run (core cells, CPU)
 
 Owner approved the core-cell cut for the scale-up (prereg Deviations, 2026-10-18): f16 ×2, Q8_0, Q4_K_M, Q2_K; primary probe + One Token battery; 40,000 requests, CPU (1.7B f16 does not fit 4 GB VRAM next to the desktop). `collect/night.py` runs both sweeps in sequence and holds a Windows execution-state request so the machine does not sleep; no power settings were changed. Launched detached so it survives the session.
+
+## 2026-10-18 — 1.7B primary-probe results and a degenerate-rule artifact
+
+1.7B is mode-collapsed on `short_bits_16` (f16: ~15 distinct strings in 2,000; top string 55%). Queries to 80% (content-only): Q8_0 32, Q4_K_M 8, Q2_K 8 (degenerate). Q8_0 is flagged degenerate only because the one-string-over-50% rule (deviation 1) also fires on the f16 reference (55%); kept as flagged and explained in `results/sweep/cpu/qwen3-1.7b__short_bits_16.md`, **not** changed post hoc. A reference-relative rule would be the natural fix for a future pre-registration. H4 mixed so far. Also fixed: the detached analysis launcher failed because the script path contains spaces and was passed unquoted; relaunched at 14:10.

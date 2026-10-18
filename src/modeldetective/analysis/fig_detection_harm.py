@@ -32,6 +32,8 @@ def main() -> None:
     harm = json.loads(Path(f"results/harm/{a.model}_mmlu_v2.json").read_text())
     null = harm["f16__run2"]
 
+    hi = max(v["flip_rate_ci95"][1] for k, v in harm.items() if not k.startswith("_"))
+    XMAX = max(0.10, -(-hi // 0.05) * 0.05 + 0.02)  # noqa: N806
     ceiling = 256  # plotted position for "not detected within the reliable range"
     fig, ax = plt.subplots(figsize=(7.2, 4.6), dpi=200)
     fig.patch.set_facecolor(SURFACE)
@@ -47,7 +49,7 @@ def main() -> None:
     )
     ax.axhspan(160, 400, color=GRID, alpha=0.6, zorder=0, lw=0)
     ax.text(
-        0.445,
+        XMAX - 0.005,
         300,
         "not detected within 125 queries",
         color=INK2,
@@ -57,6 +59,8 @@ def main() -> None:
     )
 
     for q in ORDER:
+        if q not in det["variants"] or f"{q}__run1" not in harm:
+            continue
         v = det["variants"][q]
         c = v["content_only"]
         m80 = c["queries_to_detect_80"]
@@ -80,7 +84,7 @@ def main() -> None:
             (x, y),
             xytext=(0, 9),
             textcoords="offset points",
-            ha="center",
+            ha="left" if x < 0.08 * XMAX else "center",
             color=INK,
             fontsize=9,
         )
@@ -89,7 +93,7 @@ def main() -> None:
     ax.set_ylim(0.7, 400)
     ax.set_yticks([1, 2, 4, 8, 16, 32, 64, 128])
     ax.set_yticklabels(["1", "2", "4", "8", "16", "32", "64", "128"])
-    ax.set_xlim(0, 0.45)
+    ax.set_xlim(0, XMAX)
     ax.xaxis.set_major_formatter(matplotlib.ticker.PercentFormatter(1.0, decimals=0))
     ax.set_xlabel("Harm: MMLU answers changed vs f16 (flip rate, 95% CI)", color=INK2, fontsize=9)
     ax.set_ylabel("Queries to detect (80% power, alpha = 0.05)", color=INK2, fontsize=9)
@@ -100,7 +104,7 @@ def main() -> None:
         ax.spines[s].set_color(MUTED)
     ax.tick_params(colors=INK2, labelsize=8)
     ax.set_title(
-        f"{a.model}: harm appears before detectability",
+        f"{a.model}: detectability vs harm by quantization level",
         loc="left",
         color=INK,
         fontsize=11,

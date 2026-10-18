@@ -26,6 +26,7 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", required=True)
     ap.add_argument("--backend", choices=["cpu", "cuda"], default="cuda")
+    ap.add_argument("--variants", nargs="*", default=None, help="subset of quant types")
     a = ap.parse_args()
     m = yaml.safe_load(MODELS_CFG.read_text(encoding="utf-8"))["models"][a.model]
     mdir = Path(m["local_dir"])
@@ -37,7 +38,9 @@ def main() -> None:
     out: dict = {"model": a.model, "backend": a.backend, "chunks": CHUNKS, "ctx": CTX}
     # f16 against itself is the null (should be ~0; nonzero only from backend non-determinism)
     targets = [("f16", m["reference"]["file"])] + [
-        (q, m["variants"][q]["file"]) for q in QUANT_ORDER if q in m["variants"]
+        (q, m["variants"][q]["file"])
+        for q in QUANT_ORDER
+        if q in m["variants"] and (a.variants is None or q in a.variants)
     ]
     for name, f in targets:
         r = kl_against_reference(mdir / f, TEXT, base, a.backend, CTX, CHUNKS)

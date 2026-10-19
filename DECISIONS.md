@@ -155,3 +155,7 @@ Owner approved the core-cell cut for the scale-up (prereg Deviations, 2026-10-18
 ## 2026-10-19 — Detector (a), One Token battery (English cells)
 
 1.7B: battery works; Q4_K_M detected at 80 queries (8 per cell), Q8_0 not within 160 (power 0.46), null FPR 0.034–0.041. Roughly 10× less query-efficient than the 16-bit probe at the same size, as the low-entropy-probe pitfall predicts. 0.6B: **not applicable** — under the one-word system prompt the f16 reference answers "no" to everything (Q4_K_M/Q3_K_M answer "1"), so the detector only sees a switch between failure modes. Reported, not used as evidence. First version of the analysis ignored the paper's ≥10-valid-answers rule and produced nonsense at 0.6B; fixed before writing any result. Summary: `results/one_token/README.md`. Analysis interval for this detector is the across-split percentile, not a response-level bootstrap (simplification, noted).
+
+## 2026-10-19 — 4B run: two pools silently skipped, fixed and resumed
+
+The 4B night run collected only f16 ×2 and Q8_0 because `configs/models.yaml` had been generated (sync_config) while the 4B quantization was still in progress, so it listed only Q8_0 for 4B; `plan_pools` silently dropped the requested Q4_K_M and Q2_K. Fix: regenerated the config from the complete manifests, and `plan_pools` now exits with an error when a requested variant is not in the config (test added). Resumed the run for the two missing pools; collected cells are kept (seeds are per pool, so nothing changes for them).

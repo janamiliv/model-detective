@@ -104,6 +104,31 @@ models:
     note: f16 does not fit 4 GB VRAM; CPU or cloud.
     local_dir: models/qwen3-4b
     variants:
+      Q2_K:
+        file: Qwen3-4B-Q2_K.own.gguf
+        sha256: 7945df32d039924ecc2f5b9d1ed1f68e31c351efa33a46ee2ec2e54a3add35b3
+        bpw: 3.32
+        made_with: llama-quantize Q2_K (b11429-d81235049)
+      Q3_K_M:
+        file: Qwen3-4B-Q3_K_M.own.gguf
+        sha256: 17bf4f3d994fee6c17ba00b02a19a526072dfa20dbca064ca7e0f570cf3bef61
+        bpw: 4.128
+        made_with: llama-quantize Q3_K_M (b11429-d81235049)
+      Q4_K_M:
+        file: Qwen3-4B-Q4_K_M.own.gguf
+        sha256: 2ec6036214ba72a425f3d83e8ef3a819640ecceed7ab2cdba5a725cf9831f801
+        bpw: 4.967
+        made_with: llama-quantize Q4_K_M (b11429-d81235049)
+      Q5_K_M:
+        file: Qwen3-4B-Q5_K_M.own.gguf
+        sha256: a41964936162fcce3142c4ce4ee1d70d6c9879393b7b0cfab64c655b5374eb14
+        bpw: 5.747
+        made_with: llama-quantize Q5_K_M (b11429-d81235049)
+      Q6_K:
+        file: Qwen3-4B-Q6_K.own.gguf
+        sha256: 1abf1279abfd3c972a838a10eff9cf3c843b6c03530d8a23965185f3856e5d8d
+        bpw: 6.576
+        made_with: llama-quantize Q6_K (b11429-d81235049)
       Q8_0:
         file: Qwen3-4B-Q8_0.own.gguf
         sha256: 023db7f951e8c86a800b4f991b141c48091cfee8dfb4787fb1d00bc78aaac356

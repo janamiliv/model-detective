@@ -36,3 +36,14 @@ def test_seeds_disjoint_across_all_pools_and_cells() -> None:
                 seeds.add(seed_for(cell, i))
                 count += 1
     assert len(seeds) == count
+
+
+def test_requested_variant_missing_from_config_fails_loudly() -> None:
+    import pytest
+
+    cfg = {
+        "models": {"m": {"reference": {"file": "f.gguf"}, "variants": {"Q8_0": {"file": "q.gguf"}}}}
+    }
+    with pytest.raises(SystemExit):
+        plan_pools("m", cfg, ["Q8_0", "Q4_K_M"])
+    assert [p.variant for p in plan_pools("m", cfg, ["Q8_0"])] == ["f16", "f16", "Q8_0"]

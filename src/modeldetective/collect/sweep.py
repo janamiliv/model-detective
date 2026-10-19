@@ -60,6 +60,13 @@ def iris_probe_specs(probes_cfg: dict) -> list[tuple[str, int]]:
 
 def plan_pools(model_key: str, models_cfg: dict, variants: list[str] | None = None) -> list[Pool]:
     m = models_cfg["models"][model_key]
+    if variants:
+        missing = [q for q in variants if q not in m.get("variants", {})]
+        if missing:
+            raise SystemExit(
+                f"{model_key}: variants {missing} not in configs/models.yaml; "
+                "run modeldetective.quantize.sync_config after quantizing"
+            )
     mdir = Path(m.get("local_dir", f"models/{model_key}"))
     pools = [
         Pool(model_key, "f16", 1, mdir / m["reference"]["file"]),

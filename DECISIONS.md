@@ -159,3 +159,7 @@ Owner approved the core-cell cut for the scale-up (prereg Deviations, 2026-10-18
 ## 2026-10-19 — 4B run: two pools silently skipped, fixed and resumed
 
 The 4B night run collected only f16 ×2 and Q8_0 because `configs/models.yaml` had been generated (sync_config) while the 4B quantization was still in progress, so it listed only Q8_0 for 4B; `plan_pools` silently dropped the requested Q4_K_M and Q2_K. Fix: regenerated the config from the complete manifests, and `plan_pools` now exits with an error when a requested variant is not in the config (test added). Resumed the run for the two missing pools; collected cells are kept (seeds are per pool, so nothing changes for them).
+
+## 2026-10-20 — 4B detection results; H4 reading
+
+4B primary probe (content-only): Q8_0 > 125 queries (power 0.22 at 64), Q4_K_M 2 queries (single-query 0.74), Q2_K 2 (parses 100% at 4B, not degenerate). One Token at 4B: Q4_K_M 80 queries, Q8_0 > 160, null JSD 0.018. H4 partly supported and non-monotone (1.7B outlier from mode collapse); see `results/size_comparison.md`. Harm and KL for 4B still running.
